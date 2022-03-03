@@ -10,6 +10,6 @@
         /// </summary>
         /// <param name="dropInfo">Object which contains several drop information.</param>
         /// <returns>A new object that is a copy of this instance.</returns>
-        object CloneDragItem(IDropInfo dropInfo);
+        object CloneItem(IDropInfo dropInfo);
     }
 }
