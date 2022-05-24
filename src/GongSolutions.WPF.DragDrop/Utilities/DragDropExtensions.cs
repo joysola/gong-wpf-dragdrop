@@ -92,10 +92,21 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
 
             var bounds = VisualTreeHelper.GetDescendantBounds(target);
             var cropBounds = VisualTreeExtensions.GetVisibleDescendantBounds(target);
-
+#if NET461
+            var dpiX = 1.0;
+            var dpiY = 1.0;
+            var source = PresentationSource.FromVisual(target);
+            if (source?.CompositionTarget != null)
+            {
+                dpiX = 96 * source.CompositionTarget.TransformToDevice.M11;
+                dpiY = 96 * source.CompositionTarget.TransformToDevice.M22;
+            }
+            var dpiScale = new DpiScale(dpiX, dpiY);
+#else
             var dpiScale = VisualTreeHelper.GetDpi(target);
             var dpiX = dpiScale.PixelsPerInchX;
             var dpiY = dpiScale.PixelsPerInchY;
+#endif
             var dpiBounds = DpiHelper.LogicalRectToDevice(cropBounds, dpiScale.DpiScaleX, dpiScale.DpiScaleY);
 
             var pixelWidth = (int)Math.Ceiling(dpiBounds.Width);
@@ -130,5 +141,30 @@ namespace GongSolutions.Wpf.DragDrop.Utilities
 
             return rtb;
         }
+
+#if NET461
+        public struct DpiScale
+        {
+            private readonly double _dpiScaleX;
+
+            private readonly double _dpiScaleY;
+
+            public double DpiScaleX => _dpiScaleX;
+
+            public double DpiScaleY => _dpiScaleY;
+
+            public double PixelsPerDip => _dpiScaleY;
+
+            public double PixelsPerInchX => 96.0 * _dpiScaleX;
+
+            public double PixelsPerInchY => 96.0 * _dpiScaleY;
+
+            public DpiScale(double dpiScaleX, double dpiScaleY)
+            {
+                _dpiScaleX = dpiScaleX;
+                _dpiScaleY = dpiScaleY;
+            }
+        }
+#endif
     }
 }
